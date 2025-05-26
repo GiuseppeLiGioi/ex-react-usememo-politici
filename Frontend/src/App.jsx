@@ -1,17 +1,15 @@
 /*
-📌 Milestone 3: Ottimizzare il rendering delle card con React.memo
-Attualmente, ogni volta che l’utente digita nella barra di ricerca, tutte le card vengono ri-renderizzate, anche quelle che non sono cambiate.
-Usa React.memo() per evitare il ri-render delle card quando le loro props non cambiano.
-Aggiungi un console.log() dentro il componente Card per verificare che venga renderizzato solo quando necessario.
-
-Obiettivo: Se la lista filtrata cambia, solo le nuove card devono essere renderizzate, mentre le altre rimangono in memoria senza essere ridisegnate.
+🎯 Bonus: Filtrare anche per posizione politica (position)
+Creare un array derivato che contiene tutte le posizioni politiche (position) disponibili, ma senza duplicati.
+Aggiungere un <select> sopra la lista che permette di filtrare i politici anche in base alla loro posizione.
+Modificare l’array filtrato per tenere conto sia della stringa di ricerca, sia della posizione selezionata.
 */
 
 import React from "react";
 
 
 export const Card = React.memo(({name, biography, position, image}) => {
-  console.log("Card")
+  console.log("politico")
   return(
 
      <div className="single_card">
@@ -31,6 +29,7 @@ function App() {
 
   const [politicians, setPoliticians] = useState([]);
   const [value, setValue] = useState('');
+  const [position, setPosition] = useState('');
 
   async function fetchPolitici() {
     try {
@@ -46,21 +45,36 @@ function App() {
 
   }
 
+const positions = useMemo(() => {
+const derivePositions = [];
+politicians.forEach((p) => {
+  if(!derivePositions.includes(p.position)){
+    derivePositions.push(p.position);
+  }
+})
+return derivePositions;
+}, [politicians])
+
+
+
 
   const derivePoliticians = useMemo(() => {
     return politicians.filter((p) => {
       const Name = p.name.toLowerCase().includes(value.toLowerCase())
       const Bio = p.biography.toLowerCase().includes(value.toLowerCase())
-      return Name || Bio
+      const match1 = Bio || Name;
+      const positionMatch = position.toLowerCase() === "" || p.position.toLowerCase().includes(position.toLowerCase())
+      return match1 && positionMatch
+
     })
-  }, [politicians, value])
+  }, [politicians, value, position])
 
 
 
 
   useEffect(() => {
     fetchPolitici();
-  }, [])
+  }, []) 
 
 
 
@@ -74,6 +88,20 @@ function App() {
         value={value}
         onChange={(e) => setValue(e.target.value)}
       />
+
+      <select
+      value={position}
+      onChange={(e) => setPosition(e.target.value)}
+      >
+      {
+        positions.map((p, index) => (
+          <option key={index} value={p}>{p}</option>   
+        ))
+      }
+
+      </select>
+
+
       <div className="container_card">
         {
           derivePoliticians.map((p, index) => (
