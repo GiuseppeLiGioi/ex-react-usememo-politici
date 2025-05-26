@@ -50,7 +50,7 @@ function App() {
         
           <div  key={index} className="single_card">
           <h2>{p.name}</h2>
-          <img src={p.image} className="img-card"/> 
+          <img src={p.image} alt={p.name} className="img-card"/> 
           <h5>{p.position}</h5>
           <p>{p.biography}</p>
           </div>
